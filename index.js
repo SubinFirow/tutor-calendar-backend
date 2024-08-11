@@ -1,13 +1,30 @@
+require("dotenv").config();
+
 const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const dotenv = require("dotenv");
 const eventsRouter = require("./routes/event");
 const cors = require("cors");
+const session = require("express-session");
+const passport = require("./config/passport");
 
 dotenv.config();
 const app = express();
+
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+  })
+);
+
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(bodyParser.json());
+
+app.use("/auth", require("./routes/auth"));
 
 mongoose
   .connect(process.env.MONGODB_URI)

@@ -1,17 +1,39 @@
+// routes/auth.js
 const express = require("express");
+const passport = require("passport");
+
 const router = express.Router();
-const { getAuthUrl, setCredentials, oAuth2Client } = require("../googleAuth");
 
-router.get("/google", (req, res) => {
-  const url = getAuthUrl();
-  res.redirect(url);
-});
+router.get(
+  "/google",
+  passport.authenticate("google", {
+    scope: [
+      "profile",
+      "email",
+      "openid",
+      "https://www.googleapis.com/auth/calendar",
+      "https://www.googleapis.com/auth/calendar.events",
+    ],
+  })
+);
 
-router.get("/google/callback", async (req, res) => {
-  const code = req.query.code;
-  const { tokens } = await oAuth2Client.getToken(code);
-  setCredentials(tokens);
-  res.send("Google Calendar connected");
+router.get(
+  "/google/callback",
+  passport.authenticate("google", {
+    failureRedirect: "http://localhost:3000/login",
+  }),
+  async (req, res) => {
+    res.redirect(
+      `http://localhost:3000?access_token=${req.user.accessToken}&name=${req?.user?.profile.displayName}`
+    );
+  }
+);
+
+router.get("/logout", (req, res) => {
+  req.logout((err) => {
+    if (err) return next(err);
+    res.redirect("/");
+  });
 });
 
 module.exports = router;
