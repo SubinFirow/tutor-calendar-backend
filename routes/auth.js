@@ -20,11 +20,11 @@ router.get(
 router.get(
   "/google/callback",
   passport.authenticate("google", {
-    failureRedirect: "http://localhost:3000/login",
+    failureRedirect: "https://tutor-calendar-frontend.vercel.app//login",
   }),
   async (req, res) => {
     res.redirect(
-      `http://localhost:3000?access_token=${req.user.accessToken}&name=${req?.user?.profile.displayName}`
+      `https://tutor-calendar-frontend.vercel.app?access_token=${req.user.accessToken}&name=${req?.user?.profile.displayName}`
     );
   }
 );
